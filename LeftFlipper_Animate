@@ -1,0 +1,32 @@
+Sub LeftFlipper_Animate
+	Dim a: a = LeftFlipper.CurrentAngle  			' store flipper angle in a
+	Dim bias:  bias = 0								' store bias 0 for rest 1 for up position
+	Dim max_angle, min_angle						' min and max angles from the flipper
+	max_angle = 122									' flipper down angle
+	min_angle = 69									' flipper up angle
+	FlipperLSh.RotZ = a								' set flipper shadow angle
+	bias = (max_angle - a) / (max_angle - min_angle)' calculate bias based on a and min/max 
+	If bias >= 0.99 Then bias = 1					' handle overshoot to set 1 as ceiling
+	If bias <= 0.01 Then bias = 0					' handle undershoor to set 0 as floor
+
+	Dim BP : 
+	For Each BP in BP_Lflipmesh1U
+		If bias = 0 Then 							' for 0 bias (flipper rest)
+			BP.visible = False						' turn off up position maps
+		Else										' for anything else
+			BP.visible = True						' turn on up position maps
+		End If
+		BP.Opacity = 100 * bias						' set up maps opacity based on bias
+		BP.RotZ = a 								' rotate the maps
+	Next
+	For Each BP in BP_Lflipmesh1
+		If bias = 1 Then 							' for 1 bias (fully engaged)
+			BP.visible = False						' turn off down position maps
+		Else										' for anything else
+			BP.visible = True						' turn on up position maps
+		End If
+		BP.Opacity = 100 * (1-bias)					' set down maps opacity based on bias
+		BP.RotZ = a 								' rotate the maps
+	Next
+	debug.print ("Angle: " + CStr(a) + " bias: " + CStr(bias) + ", UpOpac:" + CStr (100 * bias) + ", DownOpac:" +  CStr (100 * (1-bias)))
+End Sub
